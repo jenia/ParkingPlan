@@ -1,0 +1,160 @@
+<!--
+    ParkingPlan is a program that maps the parking schedules across the streets of the World.
+    Copyright (C) <2014>  <Evgeniy Ivlev>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    You can contact me at jenia.ivlev@gmail.com.
+-->
+<html>
+  <head>
+    <LINK rel="stylesheet" href="/static/js/jquery-mobile.css" type="text/css">
+    <script type="text/javascript" src="/static/open_layers/lib/OpenLayers.js"></script>
+    <script type="text/javascript" src="/static/Map.js"></script> 
+    <script type="text/javascript" src="/static/js/jquery.js"></script>
+    <script type="text/javascript" src="/static/ajax.js"></script>
+    <script type="text/javascript" src="/static/Forbidden_Slot.js"></script> 
+    <script type="text/javascript" src="/static/Forbidden_Slot_Array.js"></script> 
+    <script type="text/javascript" src="/static/Entry-point.js"></script> 
+    <script type="text/javascript" src="/static/js/jquery-mobile.js"></script>
+    <LINK rel="stylesheet" href="/static/style.css" type="text/css"> 
+    <access origin="*" />
+  </head>
+  <body onload="nachat();">
+    <div data-role="page" id="index">
+	<div data-role="content" role="main" >
+             <div id="map" ></div>
+	</div><!-- /content -->
+    </div>
+    <div data-role="page" id="dialog-page" data-url="dialog.html" id="dialog-jenia">
+	<div data-role="header">
+          <h3> ParkingPlan</h3>
+	</div>
+	<div data-role="content">
+          <ul data-role="listview">
+            <li id="last-list-divider" data-role="list-divider" class="divider-between-forbidden-slots"></li>
+            <li><input type="button" value="Add" id="add-slot" /></li>
+            <li><input type="button" value="Save" id="submit-slots" /></li>
+            <ul>
+	</div><!--content-->
+    </div><!--page-->
+    <div data-role="page" id="list-page" >
+      <div data-role="header">
+          <h3> ParkingPlan</h3>
+      </div>
+      <div data-role="content">
+	<ul data-role="listview">
+		<li><a id="get-all-streets" >All Locations<p>Start here: after clicking here, press on a street on the map.</p></a></li>
+		<li><a id="availability-constraints-option" href="#availability-constraints-dialog">Available Locations<p>Find streets available for parking</p></a></li>
+		<li><a id="login-list-option">Login<p>Login or Register</p></a></li>
+		<li><a id="where-am-i">Where Am I<p>This will bring you to your current GPS coordinates</p></a></li>
+	</ul>
+      </div><!--content-->
+        <div data-role="footer" data-position="fixed">
+            <h3><a href="index.html#about">About</a></h3>
+        </div>
+    </div><!--page-->
+    <div data-role="page" id="login-options-list-page"  >
+        <div data-role="header">
+          <h3> ParkingPlan</h3>
+        </div>
+        <div data-role="content">
+          <ul data-role="listview">
+            <li><a id="google-login"  rel="external" data-ajax="false" >Google<p>Login or Register using Google</p></a></li>
+            <li><a id="parking-plan-login"  rel="external" data-ajax="false">ParkingPlan<p>Login or Register using ParkingPlan</p></a></li>
+          </ul>
+        </div><!--content-->
+        <div data-role="footer" data-position="fixed">
+            <h3><a href="index.html#about">About</a></h3>
+        </div>
+    </div><!--page-->
+    <div data-role="dialog"  id="error-dialog" >
+        <div data-role="header">
+            <h3>ParkingPlan</h3>
+        </div>
+        <div data-role="content">
+          <p id="mistake-message"></p>
+        </div><!--content-->
+    </div><!--page-->
+    <div data-role="page"  id="availability-constraints-dialog" >
+        <div data-role="header">
+            <h3>ParkingPlan</h3><p>Availability Constraints</p>
+        </div>
+        <div data-role="content">
+            <ul data-role="listview">
+              <li><label ><input type="time" step="300" id="start-time" name="start-time" />Start Time</label></li>
+              <li><label ><input type="time" step="300" id="end-time" name="end-time" />Start Time</label></li>
+              <li><label ><input type="date" step="300" id="start-date" name="start-date" />Start Date</label></li>
+              <li>
+                <select id="allowed-duration">
+                  <option name="allowed" >Allowed Parking-Time Duration (default is any duration)</option>
+                  <option name="allowed" >15 min</option>
+                  <option name="allowed" >30 min</option>
+                  <option name="allowed" >45 min</option>
+                  <option name="allowed" >60 min</option>
+                  <option name="allowed" >90 min</option>
+                  <option name="allowed" >120 min</option>
+                  <option name="allowed" >240 min</option>
+                </select>
+              </li>
+              <li><input type="button" value="Fetch" /></li>
+            </ul>
+        </div><!--content-->
+        <div data-role="footer" >
+            <h3><a href="index.html#about">About</a></h3>
+        </div>
+    </div><!--page-->
+    <div id="about" data-role="page" id="login-options-list-page"  >
+        <div data-role="header">
+          <h3> ParkingPlan</h3>
+        </div>
+        <div data-role="content">
+          <p>
+            ParkingPlan is created by Evgeniy Ivlev. I'm a programmer from Montreal. I've created this software
+            to avoid paying parking tickets unnecessarily.<br>
+            
+            This is the first release of this software. Further releases will include features such as:
+            address interpolation, votings, comments, reminders and generally changes for the better incurred
+            from your feedback and my own experience in using this app.<br>
+            
+            Thank you very much for trying my software out.<br>
+            Evgeniy Ivlev
+            
+          </p>
+        </div><!--content-->
+    </div><!--page-->
+  </body>
+</html>
+
+<!--
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Page Title</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.js"></script>
+</head>
+<body>
+<div data-role="page">
+    <div data-role="header">
+        <h1>Sample</h1>
+    </div>
+    <div data-role="content">
+    </div>
+</div>
+</body>
+</html>
+
+-->

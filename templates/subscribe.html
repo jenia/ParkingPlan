@@ -1,0 +1,48 @@
+<!--
+
+    ParkingPlan is a program that maps the parking schedules across the streets of the World.
+    Copyright (C) <2014>  <Evgeniy Ivlev>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    You can contact me at jenia.ivlev@gmail.com.
+    -->
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<html>
+    <head>
+        <script type="text/javascript" src="/static/js/jquery.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-mobile.js"></script>
+        <LINK rel="stylesheet" href="/static/js/jquery-mobile.css" type="text/css">
+    </head>
+    <body>
+        <div data-role="page">
+            <div data-role="header">
+              <h3> ParkingPlan</h3>
+            </div>
+            <div data-role="content">
+              <form action="/subscribe" method="POST" data-ajax="false">
+                  <ul data-role="listview">
+                      {% csrf_token %}
+                      {{user_form.as_ul}}
+                      {{capcha_form.as_ul}}
+                      <li><input type="submit" value="Subscribe"/></li>
+                  <ul>
+              </form>
+            </div>
+            <div data-role="footer" >
+                <h3><a href="static/about.html">About</a></h3>
+            </div>
+        </div>
+    </body>
+</html>
