@@ -57,12 +57,5 @@ Installation:
 
 Database:
 
-Creating a spatial database with PostGIS 2.0 and PostgreSQL 9.1+
-
-PostGIS 2 includes an extension for Postgres 9.1+ that can be used to enable spatial functionality:
-
-    $ createdb  <db name>
-    $ psql <db name>
-    > CREATE EXTENSION postgis;
-    > CREATE EXTENSION postgis_topology;
+Follow the - clear, high quality - instructions here: https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/postgis/
 
