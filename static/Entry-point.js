@@ -189,7 +189,16 @@ Entry_Point.prototype.zoomToPosition = function(zoom) {
     var lon_lat=new OpenLayers.LonLat( -73.6207, 45.5000).transform(map.epsg4326,map.epsg900913);
     var self = this;
     this.find_gps(function(e) {
-	var location = new OpenLayers.LonLat(e.coords.longitude, e.coords.latitude).transform(map.epsg4326,map.epsg900913);
+        /**
+           Uncomment the following line if you want the initial position to be your GPS position
+        **/
+        
+	//var location = new OpenLayers.LonLat(e.coords.longitude, e.coords.latitude).transform(map.epsg4326,map.epsg900913);
+
+        /**
+           Default GPS coordinates made to match the sample data
+        **/
+        var location = new OpenLayers.LonLat(-73.63961, 45.46610).transform(map.epsg4326,map.epsg900913);
 	map.map.setCenter(location, zoom);
         self.place_marker(location);
         self.get_streets();
