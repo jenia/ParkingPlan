@@ -17,7 +17,7 @@
 
     You can contact me at jenia.ivlev@gmail.com.
 **/
-var domain = "http://www.parkingplan.ca";
+var domain = "http://localhost:8000";
 var csrf_token;
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
