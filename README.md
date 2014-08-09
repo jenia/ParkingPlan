@@ -39,6 +39,7 @@ from your feedback and my own experience in using this app.
       Pitsburg
       
 Thank you very much for trying my software.
+
 Evgeniy Ivlev
 
 
@@ -47,15 +48,43 @@ Installation:
 
 (python 3 is required)
 
-    Virtualenv <folder>
-    cd <folder>
+    Virtualenv <parking-plan-folder>
+    cd <parking-plan-folder>
     source bin/activate
 
     pip install django-simple-captcha
     pip install python-social-auth
     pip install pyscopg2
 
+
 Database:
 
 Follow the - clear, high quality - instructions here: https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/postgis/
+
+Or this is what I do:
+
+     
+
+     su
+     su - postgres
+     createdb map01
+     psql map01
+     
+     create extension postgis;
+     create extension postgis_topology;
+     \q
+     exit
+     exit
+     
+
+     python manage.py syncdb
+     psql -f sample.sql map01
+
+
+And that is it.
+To start the server run
+
+     python manage.py runserver
+     
+Now simply open your browser and go to localhost:8000/static/index.html
 
