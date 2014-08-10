@@ -249,7 +249,6 @@ function nachat(){
             entry_point = new Entry_Point();
             $.mobile.pageContainer.on("pagechange", function(event, data){
                 if(!map && data.absUrl.match(index_url)){
-                    entry_point = new Entry_Point();
                     Entry_Point.prototype.loadMapLibrary.call(entry_point);
                 }
             });
