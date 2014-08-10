@@ -65,6 +65,8 @@ function Entry_Point(){
             map.marker.removeMarker(map.marker.markers[0]);
             map.map.setCenter(location, zoom);
             self.place_marker(location);
+            map.vectors.removeAllFeatures();
+            map.output_layer.removeAllFeatures();
             self.get_streets();
         }, function(e) {
 
