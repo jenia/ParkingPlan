@@ -82,6 +82,16 @@ Or this is what I do:
 
 
 And that is it.
+
+Now all you have to do is run the server, but before that you need to change the settings.py file.
+
+Change the following variables:
+
+     DATABASES
+     STATICFILES_DIRS
+     TEMPLATE_DIRS
+
+     
 To start the server run
 
      python manage.py runserver
