@@ -140,6 +140,19 @@ Entry_Point.prototype.zoomToDefaultPosition = function() {
 
 
 Entry_Point.prototype.get_streets = function(){
+    var $this = $( this ),
+    theme = $this.jqmData( "theme" ) || $.mobile.loader.prototype.options.theme,
+    msgText = $this.jqmData( "msgtext" ) || $.mobile.loader.prototype.options.text,
+    textVisible = $this.jqmData( "textvisible" ) || $.mobile.loader.prototype.options.textVisible,
+    textonly = !!$this.jqmData( "textonly" );
+    html = $this.jqmData( "html" ) || "";
+    $.mobile.loading("show", {
+        text: msgText,
+        textVisible: textVisible,
+        theme: theme,
+        textonly: textonly,
+        html: html
+    })
     var epsg4326 = new OpenLayers.Projection("EPSG:4326");
     var epsg900913 = new OpenLayers.Projection("EPSG:900913");
     var self = this;
@@ -147,6 +160,8 @@ Entry_Point.prototype.get_streets = function(){
 		function(text){
                     var json = eval('(' + text + ')');
                     Entry_Point.prototype.draw_streets.call(self, json.streets);
+                    $.mobile.loading("hide");
+                    $.mobile.changePage("#index", {transition : "pop", role : "page"});
                 }, "", "GET");
 },
 
