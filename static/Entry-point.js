@@ -55,7 +55,6 @@ function Entry_Point(){
 		}
 	});
     
-    Entry_Point.prototype.loadMapLibrary.call(this);
 
 
     
@@ -91,7 +90,6 @@ function Entry_Point(){
 	map.vectors.removeAllFeatures();
 	map.output_layer.removeAllFeatures();
         self.get_streets();
-        $.mobile.changePage("#index", {transition : "pop", role : "page"});
     });
 
     
@@ -243,16 +241,19 @@ Entry_Point.prototype.place_marker = function(lonlat){
 function nachat(){
 
             user.construct_user();
-                new FetchAvailableParkingSlot();
+            new FetchAvailableParkingSlot();
             var pathname = document.URL;
-            if(pathname.match(domain)){
-                entry_point = new Entry_Point();
-            }
+            var index_url = new RegExp(domain + '/static/index.html$');
+            entry_point = new Entry_Point();
             $.mobile.pageContainer.on("pagechange", function(event, data){
-                if(!map && data.absUrl.match(domain)){
+                if(!map && data.absUrl.match(index_url)){
                     entry_point = new Entry_Point();
+                    Entry_Point.prototype.loadMapLibrary.call(entry_point);
                 }
             });
+            if(pathname.match(index_url)){
+                Entry_Point.prototype.loadMapLibrary.call(entry_point);
+            }
     //app.initialize();
 }
 
