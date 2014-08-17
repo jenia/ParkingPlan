@@ -35,14 +35,14 @@ function Entry_Point(){
 	var screen_size = $.mobile.getScreenHeight() - parseInt($("[data-role=content]").css("padding-bottom")) - parseInt($("[data-role=content]").css("padding-top"));
 	$("[data-role=content]").css("height", screen_size)
 	$('#dialog-page').on("pagebeforehide", function(event, data){
-            if(data.nextPage[0].id == "index"){
+            if(map && data.nextPage[0].id == "index"){
                 $("#dialog-page [data-role=listview]").children().slice(0, $("#dialog-page [data-role=listview]").children().length -4).remove();
                 map.highlightctrl.unselectAll()
             }
 	});
 
         hook.register("page_change", function(event, data){
-            if(data!=undefined && data.absUrl.search("dialog-page") > -1){
+            if(data!=undefined && data.absUrl.search("dialog-page") > -1 && map){
                 if(!error_flag){
                     Forbidden_Slot_Array.prototype.add_forbidden_slots.call(map.forbidden_slots_array);
 
