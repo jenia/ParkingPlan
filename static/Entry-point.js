@@ -39,40 +39,43 @@ function Entry_Point(){
                 $("#dialog-page [data-role=listview]").children().slice(0, $("#dialog-page [data-role=listview]").children().length -4).remove();
                 map.highlightctrl.unselectAll()
             }
-	})
-	$.mobile.pageContainer.on("pagechange", function(event, data){
-
-		if(data.absUrl == undefined){//if it back to the root
-		    //map.selectctrl.unselectAll();
-		} else if(data.absUrl.search("dialog-page") > -1){
-                    if(!error_flag){
-			Forbidden_Slot_Array.prototype.add_forbidden_slots.call(map.forbidden_slots_array);
-                       
-                    }else{
-                        error_flag = false;
-                    }
-
-		}
 	});
-    
 
+        hook.register("page_change", function(event, data){
+            if(data!=undefined && data.absUrl.search("dialog-page") > -1){
+                if(!error_flag){
+                    Forbidden_Slot_Array.prototype.add_forbidden_slots.call(map.forbidden_slots_array);
+
+                }else{
+                    error_flag = false;
+                }
+            }
+        });
+                           
+    
 
     
    $('#where-am-i').on('click', function(){
+        
         self.find_gps(function(e) {
-            var zoom = 16;
-            var location = new OpenLayers.LonLat(e.coords.longitude, e.coords.latitude).transform(map.epsg4326,map.epsg900913);
-            map.marker.removeMarker(map.marker.markers[0]);
-            map.map.setCenter(location, zoom);
-            self.place_marker(location);
-            map.vectors.removeAllFeatures();
-            map.output_layer.removeAllFeatures();
-            self.get_streets();
+            var once = do_once(function(){
+                    var zoom = 16;
+                    var location = new OpenLayers.LonLat(e.coords.longitude, e.coords.latitude).transform(map.epsg4326,map.epsg900913);
+                    map.marker.removeMarker(map.marker.markers[0]);
+                    map.map.setCenter(location, zoom);
+                    self.place_marker(location);
+                    map.vectors.removeAllFeatures();
+                    map.output_layer.removeAllFeatures();
+                    self.get_streets();
+                });
+            either_on_page_change_or_when_map_is_created(function(){
+                once();
+            });
+
         }, function(e) {
 
         });
-
-       $.mobile.changePage("#index", {transition : "pop", role : "page"});
+        $.mobile.changePage("#index", {transition : "pop", role : "page"});
     });
     
     $("#login-list-option").on("click", function(){
@@ -89,13 +92,22 @@ function Entry_Point(){
     
 
     $("#get-all-streets").on("click", function(){
-	map.vectors.removeAllFeatures();
-	map.output_layer.removeAllFeatures();
-        self.get_streets();
+        var once = do_once(function(){
+                map.vectors.removeAllFeatures();
+                map.output_layer.removeAllFeatures();
+                self.get_streets();
+            });
+        either_on_page_change_or_when_map_is_created(function(){
+            once();
+        });
+        $.mobile.changePage("#index", {transition : "pop", role : "page"});
     });
 
     
 }
+
+
+
 Entry_Point.prototype.loadMapLibrary = function() {
 
     this.map = new Map(this);
@@ -125,6 +137,7 @@ Entry_Point.prototype.get_csrf_cookie = function (){
 }
 
 
+
 Entry_Point.prototype.register_listener = function(call_back){
     this.call_backs.add(call_back);
 }
@@ -139,8 +152,7 @@ Entry_Point.prototype.zoomToDefaultPosition = function() {
     Entry_Point.prototype.zoomToPosition.call(this,16);
 },
 
-
-Entry_Point.prototype.get_streets = function(){
+Entry_Point.prototype.start_loading = function(){
     var $this = $( this ),
     theme = $this.jqmData( "theme" ) || $.mobile.loader.prototype.options.theme,
     msgText = $this.jqmData( "msgtext" ) || $.mobile.loader.prototype.options.text,
@@ -153,18 +165,24 @@ Entry_Point.prototype.get_streets = function(){
         theme: theme,
         textonly: textonly,
         html: html
-    })
+    });
+}
+
+Entry_Point.prototype.get_streets = function(){
+    this.start_loading();
     var epsg4326 = new OpenLayers.Projection("EPSG:4326");
     var epsg900913 = new OpenLayers.Projection("EPSG:900913");
     var self = this;
     call_server(domain+"/get_all_streets/?extent=" + new OpenLayers.Geometry.Point(map.map.center.lon, map.map.center.lat).transform(epsg900913, epsg4326).toString(),
 		function(text){
                     var json = eval('(' + text + ')');
-                    Entry_Point.prototype.draw_streets.call(self, json.streets);
                     $.mobile.loading("hide");
-                    $.mobile.changePage("#index", {transition : "pop", role : "page"});
+                    map.vectors.removeAllFeatures();
+                    map.output_layer.removeAllFeatures();
+                    Entry_Point.prototype.draw_streets.call(self, json.streets);
                 }, "", "GET");
 },
+
 
 
 Entry_Point.prototype.draw_streets = function(streets, availability_flag){
@@ -217,7 +235,7 @@ Entry_Point.prototype.zoomToPosition = function(zoom) {
         var location = new OpenLayers.LonLat(-73.63961, 45.46610).transform(map.epsg4326,map.epsg900913);
 	map.map.setCenter(location, zoom);
         self.place_marker(location);
-        self.get_streets();
+        hook.call("map_created");
     }, function(e) {
 	map.map.setCenter(lon_lat, zoom);
 
@@ -242,19 +260,26 @@ Entry_Point.prototype.place_marker = function(lonlat){
 
 function nachat(){
 
-            user.construct_user();
-            new FetchAvailableParkingSlot();
-            var pathname = document.URL;
-            var index_url = new RegExp(domain + '/static/index.html$');
-            entry_point = new Entry_Point();
-            $.mobile.pageContainer.on("pagechange", function(event, data){
-                if(!map && data.absUrl.match(index_url)){
-                    Entry_Point.prototype.loadMapLibrary.call(entry_point);
-                }
-            });
-            if(pathname.match(index_url)){
-                Entry_Point.prototype.loadMapLibrary.call(entry_point);
-            }
+    user.construct_user();
+    new FetchAvailableParkingSlot();
+    var pathname = document.URL;
+    entry_point = new Entry_Point();
+    hook.register("page_change", function(event, data){
+        
+        if(!map && data && entry_point.is_index_page_being_loaded(data.absUrl)){
+            Entry_Point.prototype.loadMapLibrary.call(entry_point);
+        }
+    });
+    $.mobile.pageContainer.on("pagechange", function(event, data){
+        hook.call("page_change", [event, data]);
+    });
+    hook.register("map_created", function(){
+        entry_point.get_streets();
+    });
+
+    if(entry_point.is_index_page_being_loaded(pathname)){
+        Entry_Point.prototype.loadMapLibrary.call(entry_point);
+    }
     //app.initialize();
 }
 
@@ -265,6 +290,16 @@ function nachat(){
 
 
 
+Entry_Point.prototype.is_index_page_being_loaded = function(url){
+    var index_url = new RegExp(domain + '/static/index.html$');
+    var index_url_anchor = new RegExp(domain + '/static/index.html#index$');
+    if(url.match(index_url) || url.match(index_url_anchor)){
+        return true;
+    }
+    return false;
+}
+
+    
 
 
 
