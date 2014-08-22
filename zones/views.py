@@ -49,7 +49,7 @@ from zones.models import individual_streets
 
 
 
-domain = "http://www.parkingplan.ca"
+domain = "http://localhost:8000"
 
 
 
@@ -185,8 +185,7 @@ def my_login(request):
         form = UserLoginForm(request.POST)
         # is valid check for the password to be correct
         if form.is_valid():
-            user = authenticate(username=form.cleaned_data['username'],
-                                password=form.cleaned_data['password'])
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
             if user is not None:
                 auth_login(request, user)
                 #this is for the inappbrowser
@@ -266,13 +265,13 @@ def save_form(request):
 
 def figure_out_if_theres_at_least_one_day_checked_for_each_forbidden_slot(request):
     number_of_forbidden_slots = len(request.POST.getlist('forbidden_slot_pk'))
-    mondays = request.POST.getlist('monday')
-    tuesdays = request.POST.getlist('tuesday')
-    Wed = request.POST.getlist('Wed')
-    thursdays = request.POST.getlist('thursday')
-    fridays = request.POST.getlist('friday')
-    saturdays = request.POST.getlist('saturday')
-    sundays = request.POST.getlist('sunday')
+    mondays = request.POST.getlist('Monday')
+    tuesdays = request.POST.getlist('Tuesday')
+    Wed = request.POST.getlist('Wednesday')
+    thursdays = request.POST.getlist('Thursday')
+    fridays = request.POST.getlist('Friday')
+    saturdays = request.POST.getlist('Saturday')
+    sundays = request.POST.getlist('Sunday')
     for i in range(number_of_forbidden_slots):
         if request.POST.getlist('days')[i] == '[]':
             raise Exception("You must enter at least one effective day for each forbidden-slot")
@@ -548,19 +547,19 @@ def get_all_streets_given_constraints(request):
 
 def get_day_name(i):
         if i == 0:
-            return 'monday'
+            return 'Monday'
         if i == 1:
-            return 'tuesday'
+            return 'Tuesday'
         if i == 2:
-            return 'Wed'
+            return 'Wednesday'
         if i == 3:
-            return 'thursday'
+            return 'Thursday'
         if i == 4:
-            return 'friday'
+            return 'Friday'
         if i == 5:
-            return 'saturday'
+            return 'Saturday'
         if i == 6:
-            return 'sunday'
+            return 'Sunday'
 
 
 

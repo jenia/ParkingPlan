@@ -80,7 +80,6 @@ Forbidden_Slot_Array.prototype.register_listeners = function(){
 Forbidden_Slot_Array.prototype.remove = function(index){
     var self = this;
     var remove = function(){
-            $('#forbidden-slot-' + index).nextUntil(".divider-between-forbidden-slots").remove();
             $('#forbidden-slot-' + index).remove();
             self.forbidden_slots.splice(index, 1);
     }

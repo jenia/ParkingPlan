@@ -32,14 +32,14 @@ function Entry_Point(){
     this.get_csrf_cookie();
 
     var self = this;
-	var screen_size = $.mobile.getScreenHeight() - parseInt($("[data-role=content]").css("padding-bottom")) - parseInt($("[data-role=content]").css("padding-top"));
-	$("[data-role=content]").css("height", screen_size)
-	$('#dialog-page').on("pagebeforehide", function(event, data){
+        var screen_size = $.mobile.getScreenHeight() - parseInt($("[data-role=content]").css("padding-bottom")) - parseInt($("[data-role=content]").css("padding-top"));
+        $("[data-role=content]").css("height", screen_size)
+        $('#dialog-page').on("pagebeforehide", function(event, data){
             if(map && data.nextPage[0].id == "index"){
-                $("#dialog-page [data-role=listview]").children().slice(0, $("#dialog-page [data-role=listview]").children().length -4).remove();
+                $("#dialog-page [data-role=collapsible]").remove();
                 map.highlightctrl.unselectAll()
             }
-	});
+        });
 
         hook.register("page_change", function(event, data){
             if(data!=undefined && data.absUrl.search("dialog-page") > -1 && map){
@@ -55,8 +55,8 @@ function Entry_Point(){
     
 
     
-   $('#where-am-i').on('click', function(){
-        
+    $('#where-am-i').on('click', function(){
+
         self.find_gps(function(e) {
             var once = do_once(function(){
                     var zoom = 16;
