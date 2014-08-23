@@ -81,7 +81,7 @@ Forbidden_Slot_Array.prototype.remove = function(index){
     var self = this;
     var remove = function(){
             $('#forbidden-slot-' + index).remove();
-            self.forbidden_slots.splice(index, 1);
+            self.forbidden_slots[index]=undefined;
     }
     
     if(!this.forbidden_slots[index].is_already_in_the_database()){
