@@ -22,6 +22,7 @@ from django.contrib.gis.db import models
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import ModelForm
+import json
 from captcha.fields import CaptchaField
 #
 
@@ -38,6 +39,11 @@ class individual_streets(models.Model):
     geom = models.LineStringField()
     objects = models.GeoManager()
 
+
+
+    
+    
+
 class forbidden_slot(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
@@ -46,8 +52,10 @@ class forbidden_slot(models.Model):
     days = models.ManyToManyField(Day)
     objects = models.GeoManager()
     street_side = models.CharField(max_length=9)
-    #
+    votes_up = models.IntegerField(default=0)
+    votes_down = models.IntegerField(default=0)
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    voters = models.ManyToManyField(User, through='Voters', related_name="voters")
     approved = models.BooleanField(default=False)
     accessed = models.IntegerField(null=False)
     added = models.DateField(auto_now_add=True)
@@ -55,7 +63,10 @@ class forbidden_slot(models.Model):
     allowed = models.IntegerField(default = 0)
     paid = models.BooleanField(default=False)
 
-    def to_json(self):
+    def to_json(self, user):
+        flag_user_already_voted, verdict, vote_object = self.did_user_already_vote_for_this_forbidden_slot(user)
+        if not flag_user_already_voted:
+            verdict=""
         json_str = '"start_date" : "' + self.start_date.isoformat() + '", ' + \
                    '"end_date" : "' + self.end_date.isoformat() + '", ' + \
                    '"start_time" : "' + self.start_time.isoformat()[0:-3] + '", ' + \
@@ -64,6 +75,9 @@ class forbidden_slot(models.Model):
                    '"pk" : "' + str(self.pk) + '",' + \
                    '"allowed" : "' + str(self.allowed) + '",' + \
                    '"paid" : "' + str(self.paid) + '",' + \
+                   '"votes_up" : ' + self.get_votes_up() + ',' + \
+                   '"votes_down" : ' + self.get_votes_down() + ',' + \
+                   '"user_already_voted" : "' + verdict + '",' + \
                    '"days" : ' + self.get_days()
 
         return json_str
@@ -90,13 +104,54 @@ class forbidden_slot(models.Model):
         answer = []
         for i in self.days.all():
             answer.append(i.day)
-        import json
         return json.dumps(answer)
+
+    def get_votes_up(self):
+        number = 0
+        for i in self.voters.through.objects.all():
+            if i.up_or_down:
+                number=number+1
+        return json.dumps(number)
+            
+    def get_votes_down(self):
+        number = 0
+        for i in self.voters.through.objects.all():
+            if not i.up_or_down:
+                number=number+1
+        return json.dumps(number)
+
+
+    def did_user_already_vote_for_this_forbidden_slot(self, user):
+        vote=Voters.objects.filter(voter=user, fs=self)
+        flag_user_already_voted = False
+        verdict = None
+        if len(vote)>0:
+            flag_user_already_voted = True
+            verdict = vote[0].up_or_down
+
+        verdict = self.convert_verdict_to_string(verdict)
+
+        return flag_user_already_voted, verdict, vote
+
+        
+    def convert_verdict_to_string(self, verdict):
+        if verdict == True:
+            verdict = "up"
+        else:
+            verdict = "down"
+
+        return verdict
+        
+    
 
         
 
 
 
+class Voters(models.Model):
+    voter = models.ForeignKey(User, related_name="voter")
+    fs = models.ForeignKey(forbidden_slot, related_name="fs")
+    up_or_down = models.BooleanField()
         
         
 class UserLoginForm(ModelForm):

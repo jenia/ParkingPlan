@@ -22,6 +22,7 @@
 import json
 from django.views.decorators.csrf import ensure_csrf_cookie
 import pdb
+from zones.models import Voters
 from zones.models import Day
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.csrf import csrf_protect
@@ -96,7 +97,7 @@ def get_forbidden_slots_for_one_street(request):
         if len(all_forbidden_slots) > 0:
             json_str += '"forbidden_slots" : ['
             for j in range(len(all_forbidden_slots)):
-                json_str += '{' + all_forbidden_slots[j].to_json() + '},'
+                json_str += '{' + all_forbidden_slots[j].to_json(request.user) + '},'
             
             json_str = json_str[0 : -1] + ']},'
         else:
@@ -576,3 +577,40 @@ def set_csrf_cookie(request):
     
 
 
+
+
+def vote(request):
+    if request.method == "POST":
+        if request.user.is_authenticated():
+            fs_id = request.POST.get("pk")
+            fs = forbidden_slot.objects.get(pk=int(fs_id))
+            verdict = request.POST.get("vote")
+            flag_user_already_voted, up_or_down, vote= fs.did_user_already_vote_for_this_forbidden_slot(request.user)
+            if flag_user_already_voted:
+                if verdict == "up" and up_or_down=="up":
+                    remove_user_vote(vote)
+                    return HttpResponse('{"remove" : "up"}')
+                if verdict == "down" and up_or_down=="down":
+                    remove_user_vote(vote)
+                    return HttpResponse('{"remove" : "down"}')
+            elif verdict == "up":
+                vote = Voters(voter=request.user, fs=fs, up_or_down = True)
+                vote.save()
+                return HttpResponse('{"vote" : "up"}')
+            elif verdict == "down":
+                vote = Voters(voter=request.user, fs=fs, up_or_down = False)
+                vote.save()
+                return HttpResponse('{"vote" : "down"}')
+            fs.save()
+    return HttpResponse('{}')
+
+
+
+
+    
+                
+
+
+def remove_user_vote(voter):
+    voter.delete()
+    

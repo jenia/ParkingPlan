@@ -44,12 +44,19 @@ Forbidden_Slot.prototype.is_already_in_the_database = function(){
 }
 
 
-Forbidden_Slot.prototype.add_yourself = function(start_date, end_date, start_time, end_time, pk, days, allowed, paid){
+    
+
+Forbidden_Slot.prototype.add_yourself = function(start_date, end_date, start_time, end_time, pk, days, allowed, paid, votes_up, votes_down, user_already_voted){
     days == undefined ? days = [] : '';
     var self= this;
     $("#set").append('\
         <div id="forbidden-slot-'+this.index+'" data-role="collapsible" id="set1" data-collapsed="'+(pk ? 'true' : 'false') + '">\
-          <h3>' + (pk ? 'Start-Time: ' + start_time + '<br> End-Time: ' + end_time + '<br>Days: ' + days : 'New Forbidden-Slot') + '</h3>\
+          <h3>' + (pk ? 'Start-Time: ' + start_time + '<br> End-Time: ' + end_time + '<br>Days: ' + days  +
+               '<input id="up' + this.index + '" type="image" src="/static/img/hand-sketch.png" style="height:50px; width:50px; float:right"><label id="up_label_'
+                   + this.index + '" for="up' + this.index + '" style="margin-top:30px; float:right ">' + votes_up + '</label>\
+                <input id="down' + this.index + '" type="image" src="/static/img/hand-sketch-down.png" style="height:50px; width:50px; float:right"><label id="down_label_'
+                   + this.index + '" for="down' + this.index + '" style="margin-top:30px; float:right">' + votes_down + '</label>' : 'New Forbidden-Slot' + this.index) +
+          '</h3>\
           <ul data-role="listview">\
             <li data-role="list-divider" class="divider-between-forbidden-slots"><h1>Forbidden Slot ' + (this.index+1) +'</h1></li>\
             <li><label for="paid-'+this.index+'"><input type="checkbox" id="paid-'+this.index+'" name="paid"' + (this.paid ? ' checked="true"' : 'false') + ' />Paid</label></li>\
@@ -79,7 +86,7 @@ Forbidden_Slot.prototype.add_yourself = function(start_date, end_date, start_tim
               <fieldset name="days" data-role="controlgroup">\
                   <input type="checkbox"  name="Monday" id="Monday'+this.index+'" '+(days.indexOf("Monday") > -1 ? " checked" : "")+' \><label for="Monday'+this.index+'">Monday</label>\
                   <input type="checkbox"  name="Tuesday" id="Tuesday'+this.index+'" '+(days.indexOf("Tuesday") > -1 ? " checked" : "")+' \><label for="Tuesday'+this.index+'">Tuesday</label>\
-                  <input type="checkbox"  name="Wednesdaynesday" id="Wednesday'+this.index+'" '+(days.indexOf("Wednesday") > -1 ? " checked" : "")+' \><label for="Wednesday'+this.index+'">Wednesdaynesday</label>\
+                  <input type="checkbox"  name="Wednesday" id="Wednesday'+this.index+'" '+(days.indexOf("Wednesday") > -1 ? " checked" : "")+' \><label for="Wednesday'+this.index+'">Wednesday</label>\
                   <input type="checkbox"  name="Thursday" id="Thursday'+this.index+'" '+(days.indexOf("Thursday") > -1 ? " checked" : "")+' \><label for="Thursday'+this.index+'">Thursday</label>\
                   <input type="checkbox"  name="Friday" id="Friday'+this.index+'" '+(days.indexOf("Friday") > -1 ? " checked" : "")+' \><label for="Friday'+this.index+'">Friday</label>\
                   <input type="checkbox"  name="Saturday" id="Saturday'+this.index+'" '+(days.indexOf("Saturday") > -1 ? " checked" : "")+' \><label for="Saturday'+this.index+'">Saturday</label>\
@@ -95,6 +102,9 @@ Forbidden_Slot.prototype.add_yourself = function(start_date, end_date, start_tim
        </div>\
       ').collapsibleset('refresh');
 
+    if(user_already_voted){
+        this.color_vote(user_already_voted);
+    }
     var self = this;
     $('#remove-slot-' + this.index).on('click', function(){
 	Forbidden_Slot_Array.prototype.remove.call(self.forbidden_slots_array, self.index);
@@ -108,9 +118,60 @@ Forbidden_Slot.prototype.add_yourself = function(start_date, end_date, start_tim
             Forbidden_Slot.prototype.all_day_forbidden.call(self);
         }
     });
+
+    $("#up" + this.index).on("click", function(e){
+        Forbidden_Slot.prototype.make_call_about_voting.call(self, e, "up", pk);
+    });
+    $("#down" + this.index).on("click", function(e){
+        Forbidden_Slot.prototype.make_call_about_voting.call(self, e, "down", pk);
+    });
+                    
     
 }
 
+Forbidden_Slot.prototype.make_call_about_voting = function(e, up_or_down, pk){
+    var self = this;
+    e.preventDefault();
+    var submission_string = "vote=" + up_or_down + "&pk=" + pk;
+    Forbidden_Slot.prototype.vote.call(self, submission_string);
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+}
+
+
+Forbidden_Slot.prototype.color_vote = function(user_already_voted){
+    if(user_already_voted=="up"){
+        $("#up_label_" + this.index).css("color", "blue");
+    }else if(user_already_voted == "down"){
+        $("#down_label_" + this.index).css("color", "blue");
+    }
+}
+        
+
+
+Forbidden_Slot.prototype.vote = function(submission_string){
+    var self = this;
+    call_server(domain + "/vote", function(response){
+        var json = JSON.parse(response);
+        if(json.vote == "up"){
+            $("#up_label_" + self.index)[0].textContent = parseInt($("#up_label_" + self.index)[0].textContent) + 1;
+            $("#up_label_" + self.index).css("color", "blue");
+        }
+        else if(json.vote == "down"){
+            $("#down_label_" + self.index)[0].textContent = parseInt($("#down_label_" + self.index)[0].textContent) + 1;
+            $("#down_label_" + self.index).css("color", "blue");
+        }
+        else if(json.remove == "up"){
+            $("#up_label_" + self.index)[0].textContent = parseInt($("#up_label_" + self.index)[0].textContent) - 1;
+            $("#up_label_" + self.index).css("color", "black");
+        }
+        else if(json.remove == "down"){
+            $("#down_label_" + self.index)[0].textContent = parseInt($("#down_label_" + self.index)[0].textContent) - 1;
+            $("#down_label_" + self.index).css("color", "black");
+        }
+    }, submission_string, "POST");
+}
+    
 Forbidden_Slot.prototype.all_day_forbidden = function(){
 
     $("#start-time"+this.index).val("00:00")

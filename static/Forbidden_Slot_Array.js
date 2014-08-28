@@ -43,7 +43,11 @@ Forbidden_Slot_Array.prototype.add_forbidden_slots = function(){
                                                                  self.geom.forbidden_slots[i].pk,
                                                                  self.geom.forbidden_slots[i].days,
                                                                  self.geom.forbidden_slots[i].allowed,
-                                                                 self.geom.forbidden_slots[i].paid);
+                                                                 self.geom.forbidden_slots[i].paid,
+                                                                 self.geom.forbidden_slots[i].votes_up,
+                                                                 self.geom.forbidden_slots[i].votes_down,
+                                                                 self.geom.forbidden_slots[i].user_already_voted
+                                                          );
             }
 
     };

@@ -43,7 +43,8 @@ urlpatterns = patterns('',
     url(r'figure_out_if_post_data_is_in_session', 'zones.views.figure_out_if_post_data_is_in_session'),
     url(r'logout', 'zones.views.my_logout'),
     url(r'get_available_streets', 'zones.views.get_all_streets_given_constraints'),
-                       url(r'set_csrf_cookie', set_csrf_cookie),
+    url(r'set_csrf_cookie', set_csrf_cookie),
+    url(r'vote', "zones.views.vote"),
 
 
     # Uncomment the admin/doc line below to enable admin documentation:

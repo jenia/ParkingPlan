@@ -308,7 +308,11 @@ Map.prototype.populate_side_with_forbidden_slots = function(forbidden_slots, geo
 		pk : forbidden_slots[i].pk,
 		days : forbidden_slots[i].days,
                 allowed : forbidden_slots[i].allowed,
-                paid : forbidden_slots[i].paid
+                paid : forbidden_slots[i].paid,
+                votes_up : forbidden_slots[i].votes_up,
+                votes_down : forbidden_slots[i].votes_down,
+                user_already_voted : forbidden_slots[i].user_already_voted
+                
 	    });
 	}
 	else if(forbidden_slots[i].street_side == 2 && geom.side==2){
@@ -320,7 +324,10 @@ Map.prototype.populate_side_with_forbidden_slots = function(forbidden_slots, geo
 		pk : forbidden_slots[i].pk,
 		days : forbidden_slots[i].days,
                 allowed : forbidden_slots[i].allowed,
-                paid : forbidden_slots[i].paid
+                paid : forbidden_slots[i].paid,
+                votes_up : forbidden_slots[i].votes_up,
+                votes_down : forbidden_slots[i].votes_down,
+                user_already_voted : forbidden_slots[i].user_already_voted
 	    });
 	}
     }
