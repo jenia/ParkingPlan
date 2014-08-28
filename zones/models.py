@@ -122,6 +122,8 @@ class forbidden_slot(models.Model):
 
 
     def did_user_already_vote_for_this_forbidden_slot(self, user):
+        if not user.is_authenticated():
+            return False, "", None
         vote=Voters.objects.filter(voter=user, fs=self)
         flag_user_already_voted = False
         verdict = None
