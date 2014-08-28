@@ -31,7 +31,7 @@ function Forbidden_Slot(index, forbidden_slots_array, pk, paid){
     var self = this;
     if(pk > 0){
     }else{
-	Forbidden_Slot.prototype.add_yourself.call(this);
+	Forbidden_Slot.prototype.add_yourself.call(this);//this is only called when the are no forbidden_slots for this city block
     }
 }
 
@@ -44,13 +44,14 @@ Forbidden_Slot.prototype.is_already_in_the_database = function(){
 }
 
 
+
     
 
 Forbidden_Slot.prototype.add_yourself = function(start_date, end_date, start_time, end_time, pk, days, allowed, paid, votes_up, votes_down, user_already_voted){
     days == undefined ? days = [] : '';
     var self= this;
     $("#set").append('\
-        <div id="forbidden-slot-'+this.index+'" data-role="collapsible" id="set1" data-collapsed="'+(pk ? 'true' : 'false') + '">\
+       <div id="forbidden-slot-'+this.index+'" data-role="collapsible" id="set1" data-collapsed="'+(pk ? 'true' : 'false') + '">\
           <h3>' + (pk ? 'Start-Time: ' + start_time + '<br> End-Time: ' + end_time + '<br>Days: ' + days  +
                '<input id="up' + this.index + '" type="image" src="/static/img/hand-sketch.png" style="height:50px; width:50px; float:right"><label id="up_label_'
                    + this.index + '" for="up' + this.index + '" style="margin-top:30px; float:right ">' + votes_up + '</label>\

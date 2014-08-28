@@ -51,11 +51,20 @@ Forbidden_Slot_Array.prototype.add_forbidden_slots = function(){
             }
 
     };
-    foo();   
+
+    if(this.geom.forbidden_slots.length > 0){
+        foo();   
+    }else{
+        Forbidden_Slot_Array.prototype.invite_message.call(self);
+    }
 };
 
+Forbidden_Slot_Array.prototype.invite_message = function(){
+    $("#set").append('<div id="greetings-message"><h3>Pleae be the first one to submit a schedule for this street block</h3></div>');
+} 
 
 Forbidden_Slot_Array.prototype.add_forbidden_slot = function(){
+    $("#greetings-message").remove();
     this.forbidden_slots.push(new Forbidden_Slot(this.forbidden_slots.length, this, -1));
 }; 
 
