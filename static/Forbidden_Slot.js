@@ -181,7 +181,7 @@ Forbidden_Slot.prototype.all_day_forbidden = function(){
     $("#end-date"+this.index).val("2020-12-31")
     $('#Monday'+this.index).prop('checked', true).checkboxradio('refresh');
     $('#Tuesday'+this.index).prop('checked', true).checkboxradio('refresh');
-    $('#Wednesday'+This.index).prop('checked', true).checkboxradio('refresh');
+    $('#Wednesday'+this.index).prop('checked', true).checkboxradio('refresh');
     $('#Thursday'+this.index).prop('checked', true).checkboxradio('refresh');
     $('#Friday'+this.index).prop('checked', true).checkboxradio('refresh');
     $('#Saturday'+this.index).prop('checked', true).checkboxradio('refresh');

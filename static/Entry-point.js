@@ -37,6 +37,7 @@ function Entry_Point(){
         $('#dialog-page').on("pagebeforehide", function(event, data){
             if(map && data.nextPage[0].id == "index"){
                 $("#dialog-page [data-role=collapsible]").remove();
+                $("#greetings-message").remove();
                 map.highlightctrl.unselectAll()
             }
         });
