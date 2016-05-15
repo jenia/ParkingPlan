@@ -21,33 +21,26 @@
 
 
 
-SELECT street.id as id, ST_AsText(scale_LineString(street.geom)) as geom,
-       CASE WHEN EXISTS (SELECT 1 FROM cshs, cs
-         WHERE
-           cshs.side = 1
-           AND (DATE '%s', DATE '%s') OVERLAPS (cs.start_date, cs.end_date)
-           AND (TIME '%s', TIME '%s') OVERLAPS (start_time, end_time)
-           AND EXTRACT(DOW FROM DATE '%s') IN (SELECT array_to_days(cs.days)))
-       OR EXISTS (SELECT 1 FROM cshs, cs
-          WHERE
-            cshs.side = 2
-            AND (DATE '%s', DATE '%s') OVERLAPS (cs.start_date, cs.end_date) 
-            AND (TIME '%s', TIME '%s') OVERLAPS (start_time, end_time)
-            AND EXTRACT(DOW FROM DATE '%s') IN (SELECT array_to_days(cs.days)))
-
-       THEN 'FALSE'
-       ELSE 'TRUE'
-       END AS allowed
+SELECT DISTINCT STREET.ID AS ID,
+                ST_AsText(scale_LineString(street.geom)) as geom,
+                street_side,
+                CASE WHEN    AND (DATE '%s', DATE '%s') OVERLAPS (cs.start_date, cs.end_date)
+                             AND (TIME '%s', TIME '%s') OVERLAPS (start_time, end_time)
+                             AND EXTRACT(DOW FROM DATE '%s') IN (day))
+                THEN 'FALSE'
+                ELSE 'TRUE'
+                END AS allowed
 FROM
-    montreal_blocks as street,
-    city_street_has_schedule as cshs
-    city_schedules as cs, 
-    unnest(start_times, end_times) as u(start_time, end_time)
+       montreal_blocks as street,
+       city_street_has_schedules as cshs,
+       city_schedules as cs, 
+       unnest(start_times, end_times, days) as u(start_time, end_time, day)
 WHERE
-    ST_DWITHIN  (
-               st_transform(street.geom, 900913),
-               st_transform(ST_GeomFromText('%s', 4326), 900913),
-               350
-    )
-    AND cshs.montreal_block_id = street.id
-    AND cshs.city_schedule_id = city_schedules.id
+       ST_DWITHIN  (
+          st_transform(street.geom, 900913),
+          st_transform(ST_GeomFromText('%s', 4326), 900913),
+          350
+      )
+      AND cshs.montreal_block_id = street.id
+      AND cshs.city_schedule_id = cs.id
+      GROUP BY ([IF side1 OR side2 allowed, the alloweded, otherwise not-allowed])
